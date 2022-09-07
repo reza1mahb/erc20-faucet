@@ -1,14 +1,14 @@
-import React, {useState} from 'react';
+import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 
-import CircularProgress from '@material-ui/core/CircularProgress';
-import Paper from '@material-ui/core/Paper';
+// import CircularProgress from '@material-ui/core/CircularProgress';
+// import Paper from '@material-ui/core/Paper';
 import Typography from '@material-ui/core/Typography';
 import { SnackbarProvider } from 'notistack';
 import Chip from '@material-ui/core/Chip';
 import GithubIcon from 'mdi-material-ui/GithubCircle';
 
-import {useEtherProvider} from 'use-ether-provider';
+// import {useEtherProvider} from 'use-ether-provider';
 
 const useStyles = makeStyles(theme => ({
   container: {
@@ -89,19 +89,19 @@ const useStyles = makeStyles(theme => ({
 
 let Root = ({children, setError}) => {
   const classes = useStyles();
-  const provider = useEtherProvider();
+  // const provider = useEtherProvider();
 
-  if (!provider) {
-    return (
-      <div className={classes.dialogWrapper}>
-        <Paper className={classes.dialog}>
-          <Typography variant={'h6'}>Support [Rinkeby testnet] only</Typography>
-          <Typography>Waiting for Ethereum wallet...</Typography>
-          <CircularProgress />
-        </Paper>
-      </div>
-    );
-  }
+  // if (!provider) {
+  //   return (
+  //     <div className={classes.dialogWrapper}>
+  //       <Paper className={classes.dialog}>
+  //         <Typography variant={'h6'}>Support [Rinkeby testnet] only</Typography>
+  //         <Typography>Waiting for Ethereum wallet...</Typography>
+  //         <CircularProgress />
+  //       </Paper>
+  //     </div>
+  //   );
+  // }
   return (
     <div className={classes.container}>
       <div className={classes.contWrapper}>

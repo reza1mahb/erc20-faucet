@@ -9,7 +9,7 @@ import theme from '../styles/theme';
 // import withReduxSaga from 'next-redux-saga';
 // import {initStore} from '../redux/store';
 import {APP_NAME} from '../lib/constants';
-import {EtherProvider} from 'use-ether-provider';
+// import {EtherProvider} from 'use-ether-provider';
 
 class MyApp extends App {
   componentDidMount() {
@@ -31,9 +31,9 @@ class MyApp extends App {
         <ThemeProvider theme={theme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <EtherProvider networks={[4]} ms={1000}>
-            <Component {...pageProps} />
-          </EtherProvider>
+          {/* <EtherProvider networks={[4]} ms={1000}> */}
+          <Component {...pageProps} />
+          {/* </EtherProvider> */}
         </ThemeProvider>
       </React.Fragment>
     );

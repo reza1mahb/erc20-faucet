@@ -12,9 +12,10 @@ import Typography from '@material-ui/core/Typography';
 // import InputBase from '@material-ui/core/InputBase';
 import MineIcon from 'mdi-material-ui/Pickaxe';
 import cn from 'classnames';
+import * as ethers from 'ethers';
 
 import Root from '../components/Root';
-import {useEtherProvider, useAccount} from 'use-ether-provider';
+// import {useEtherProvider, useAccount} from 'use-ether-provider';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -95,37 +96,171 @@ let Index = ({
   const [addrErr, setAddrErr] = useState(false);
   const [amountErr, setAmountErr] = useState(false);
 
-  const etherProvider = useEtherProvider();
-  const myAddress = useAccount(etherProvider);
+  // const etherProvider = useEtherProvider();
+  // const myAddress = useAccount(etherProvider);
 
   const [usdtContract, setUsdtContract] = useState(null);
   const [myBalance, setMyBalance] = useState('0.0');
+  const [error, setError] = useState();
+
+  const [haveMetamask, setHaveMetamask] = useState(true);
+
+  const [client, setClient] = useState({
+    isConnected: false
+  });
+
+  const changeNetwork = async () => {
+    if (!window.ethereum) throw new Error('No crypto wallet found');
+    try {
+      await window.ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x5' }]
+      });
+    } catch (switchError) {
+      // This error code indicates that the chain has not been added to MetaMask.
+      if (switchError.code === 4902) {
+        try {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainId: '0x5',
+                chainName: 'Goerli',
+                nativeCurrency: {
+                  name: 'GoerliETH',
+                  symbol: 'GoerliETH',
+                  decimals: 18
+                },
+                rpcUrls: ['https://goerli.infura.io/v3/9f0c70345c8d4f9ea915af6a6141cf70'],
+                blockExplorerUrls: ['https://goerli.etherscan.io/']
+              }
+            ]
+          });
+        } catch (addError) {
+          throw addError;
+        }
+      }
+    }
+  };
+
+  const checkConnection = async () => {
+    const { ethereum } = window;
+    if (ethereum) {
+      setHaveMetamask(true);
+      const accounts = await ethereum.request({ method: 'eth_accounts' });
+      if (accounts.length > 0) {
+        setClient({
+          isConnected: true,
+          address: accounts[0]
+        });
+      } else {
+        setClient({
+          isConnected: false
+        });
+      }
+    } else {
+      setHaveMetamask(false);
+    }
+  };
+
+  const connectWeb3 = async () => {
+    try {
+      const { ethereum } = window;
+
+      if (!ethereum) {
+        console.log('Metamask not detected');
+        return;
+      }
+      const chainId = parseInt(window.ethereum.chainId);
+
+      if (chainId !== 5) {
+        setError();
+        await changeNetwork();
+      }
+
+      const accounts = await ethereum.request({
+        method: 'eth_requestAccounts'
+      });
+
+      setClient({
+        isConnected: true,
+        address: accounts[0]
+      });
+    } catch (error) {
+      console.log('Error connecting to metamask', error);
+    }
+  };
+
+  useEffect(() => {
+    checkConnection();
+    connectWeb3();
+  }, []);
 
   useEffect(() => {
     let interval;
-    if (etherProvider) {
-      const contract = getContractInstance(etherProvider.getSigner(), 4);
-      setUsdtContract(contract);
-
-      if (interval) {
-        clearInterval(interval);
-      }
+    const { ethereum } = window;
+    if (ethereum) {
+      const address = client.address;
       if (address) {
-        contract.balanceOf(address).then(balance => setMyBalance(
-          toUSD(balance)
-        ));
-        interval = setInterval(() => {
-          // console.log(myAddress);
+        console.log('address:', address);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = getContractInstance(provider, 5);
+        setUsdtContract(contract);
+        if (interval) {
+          clearInterval(interval);
+        }
+        if (address) {
           contract.balanceOf(address).then(balance => setMyBalance(
             toUSD(balance)
           ));
-        }, 10000); // 10s
+          interval = setInterval(() => {
+            // console.log(myAddress);
+            contract.balanceOf(address).then(balance => setMyBalance(
+              toUSD(balance)
+            ));
+          }, 10000); // 10s
+        }
       }
     }
     return () => {
       clearInterval(interval);
     };
-  }, [address, etherProvider]);
+  }, [client]);
+
+  // useEffect(() => {
+  //   let interval;
+  //   if (etherProvider) {
+  //     const contract = getContractInstance(etherProvider.getSigner(), 4);
+  //     setUsdtContract(contract);
+
+  //     if (interval) {
+  //       clearInterval(interval);
+  //     }
+  //     if (address) {
+  //       contract.balanceOf(address).then(balance => setMyBalance(
+  //         toUSD(balance)
+  //       ));
+  //       interval = setInterval(() => {
+  //         // console.log(myAddress);
+  //         contract.balanceOf(address).then(balance => setMyBalance(
+  //           toUSD(balance)
+  //         ));
+  //       }, 10000); // 10s
+  //     }
+  //   }
+  //   return () => {
+  //     clearInterval(interval);
+  //   };
+  // }, [address, etherProvider]);
+
+  // useEffect(async () => {
+  //   if (etherProvider) {
+  //     console.log(window.ethereum.chainId);
+  //   }
+  //   window.ethereum.on('chainChanged', (chainId) => {
+  //     console.log({ chainId });
+  //   });
+  // }, [etherProvider]);
 
   return (
     <Root>
@@ -135,6 +270,7 @@ let Index = ({
       <div className={classes.mainCont}>
         <Paper className={classes.inputCont}>
           <div className={classes.cell}>
+            <Typography>{`My Address: ${client.address || '-'}`}</Typography>
             <Typography>{`My Balance: ${myBalance} TUSDT`}</Typography>
           </div>
           <div className={classes.line}>
