@@ -84,6 +84,10 @@ function toUSD(bn) {
   return new BN(bn.toString()).dividedBy(1e6).toString();
 }
 
+function toBIT(bn) {
+  return new BN(bn.toString()).dividedBy(1e18).toString();
+}
+
 let Index = ({
   dispatchGeneFetch,
   pinnedDragons = [],
@@ -211,12 +215,12 @@ let Index = ({
         }
         if (address) {
           contract.balanceOf(address).then(balance => setMyBalance(
-            toUSD(balance)
+            toBIT(balance)
           ));
           interval = setInterval(() => {
             // console.log(myAddress);
             contract.balanceOf(address).then(balance => setMyBalance(
-              toUSD(balance)
+                toBIT(balance)
             ));
           }, 10000); // 10s
         }
