@@ -225,7 +225,7 @@ let Index = ({
   return (
     <Root>
       <div className={classes.header}>
-        <Typography className={classes.font}>Bybit Testnet USDT Faucet</Typography>
+        <Typography className={classes.font}>Mantle Testnet Bit Token Faucet</Typography>
       </div>
       <div className={classes.mainCont}>
         <Paper className={classes.inputCont}>
