@@ -6,7 +6,7 @@ import { makeStyles } from '@material-ui/styles';
 import Typography from '@material-ui/core/Typography';
 import { SnackbarProvider } from 'notistack';
 import Chip from '@material-ui/core/Chip';
-import GithubIcon from 'mdi-material-ui/GithubCircle';
+// import GithubIcon from 'mdi-material-ui/GithubCircle';
 
 // import {useEtherProvider} from 'use-ether-provider';
 
@@ -109,19 +109,19 @@ let Root = ({children, setError}) => {
       </div>
       <div className={classes.footer}>
         <div className={classes.icons}>
-          <Chip
-            icon={<GithubIcon />}
-            label={'Star'}
-            className={classes.chip}
-            component='a'
-            href={`https://github.com/bybit-exchange/erc20-faucet`}
-            target={'_blank'}
-            clickable
-            color='secondary'
-            variant='outlined'
-          />
+          {/*<Chip*/}
+          {/*  icon={<GithubIcon />}*/}
+          {/*  label={'Star'}*/}
+          {/*  className={classes.chip}*/}
+          {/*  component='a'*/}
+          {/*  href={`https://github.com/bybit-exchange/erc20-faucet`}*/}
+          {/*  target={'_blank'}*/}
+          {/*  clickable*/}
+          {/*  color='secondary'*/}
+          {/*  variant='outlined'*/}
+          {/*/>*/}
         </div>
-        <Typography className={classes.by}>{`bybit exchange`}</Typography>
+        <Typography className={classes.by}>{`bitdao.io/mantle`}</Typography>
       </div>
     </div>
   );

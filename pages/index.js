@@ -1,21 +1,16 @@
 import React, {useState, useEffect} from 'react';
-import { makeStyles } from '@material-ui/styles';
-
 import BN from 'bignumber.js';
-import {getContractInstance} from '../artifacts';
-// import Router, {useRouter} from 'next/router';
-
 import Paper from '@material-ui/core/Paper';
 import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography';
-// import InputBase from '@material-ui/core/InputBase';
+import { makeStyles } from '@material-ui/styles';
+import {getContractInstance} from '../artifacts';
 import MineIcon from 'mdi-material-ui/Pickaxe';
 import cn from 'classnames';
 import * as ethers from 'ethers';
 
 import Root from '../components/Root';
-// import {useEtherProvider, useAccount} from 'use-ether-provider';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -99,9 +94,6 @@ let Index = ({
   const [txs, setTxs] = useState([]);
   const [addrErr, setAddrErr] = useState(false);
   const [amountErr, setAmountErr] = useState(false);
-
-  // const etherProvider = useEtherProvider();
-  // const myAddress = useAccount(etherProvider);
 
   const [usdtContract, setUsdtContract] = useState(null);
   const [myBalance, setMyBalance] = useState('0.0');
@@ -218,7 +210,6 @@ let Index = ({
             toBIT(balance)
           ));
           interval = setInterval(() => {
-            // console.log(myAddress);
             contract.balanceOf(address).then(balance => setMyBalance(
                 toBIT(balance)
             ));
@@ -231,41 +222,6 @@ let Index = ({
     };
   }, [client]);
 
-  // useEffect(() => {
-  //   let interval;
-  //   if (etherProvider) {
-  //     const contract = getContractInstance(etherProvider.getSigner(), 4);
-  //     setUsdtContract(contract);
-
-  //     if (interval) {
-  //       clearInterval(interval);
-  //     }
-  //     if (address) {
-  //       contract.balanceOf(address).then(balance => setMyBalance(
-  //         toUSD(balance)
-  //       ));
-  //       interval = setInterval(() => {
-  //         // console.log(myAddress);
-  //         contract.balanceOf(address).then(balance => setMyBalance(
-  //           toUSD(balance)
-  //         ));
-  //       }, 10000); // 10s
-  //     }
-  //   }
-  //   return () => {
-  //     clearInterval(interval);
-  //   };
-  // }, [address, etherProvider]);
-
-  // useEffect(async () => {
-  //   if (etherProvider) {
-  //     console.log(window.ethereum.chainId);
-  //   }
-  //   window.ethereum.on('chainChanged', (chainId) => {
-  //     console.log({ chainId });
-  //   });
-  // }, [etherProvider]);
-
   return (
     <Root>
       <div className={classes.header}>
@@ -275,7 +231,7 @@ let Index = ({
         <Paper className={classes.inputCont}>
           <div className={classes.cell}>
             <Typography>{`My Address: ${client.address || '-'}`}</Typography>
-            <Typography>{`My Balance: ${myBalance} TUSDT`}</Typography>
+            <Typography>{`My Balance: ${myBalance} BIT`}</Typography>
           </div>
           <div className={classes.line}>
             <TextField required id={'address'} label={'ETH address'} spellCheck={false}
@@ -286,7 +242,7 @@ let Index = ({
               value={address}
               placeholder={'0x1234...'}
               onChange={e => setAddress(e.target.value)} />
-            <Button className={classes.smbtn} variant={'contained'} size={'small'} onClick={e => setAddress(myAddress)}>Self</Button>
+            <Button className={classes.smbtn} variant={'contained'} size={'small'} onClick={e => setAddress(client.address)}>Self</Button>
           </div>
           <TextField required id={'amount'} label={'Token Amount'} type={'number'}
             error={amountErr}
