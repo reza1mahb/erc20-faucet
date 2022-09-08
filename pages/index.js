@@ -200,7 +200,8 @@ let Index = ({
       if (address) {
         console.log('address:', address);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = getContractInstance(provider, 5);
+        const signer = provider.getSigner();
+        const contract = getContractInstance(signer, 5);
         setBitContract(contract);
         if (interval) {
           clearInterval(interval);
@@ -279,7 +280,7 @@ let Index = ({
             {
               txs.map(tx => (
                 <div key={tx} className={classes.tx}>
-                  <a target={'_blank'} href={`https://rinkeby.etherscan.io/tx/${tx}`}>{short(tx, 8)}</a>
+                  <a target={'_blank'} href={`https://goerli.etherscan.io/tx/${tx}`}>{short(tx, 8)}</a>
                 </div>
               ))
             }
