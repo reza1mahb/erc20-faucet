@@ -95,7 +95,7 @@ let Index = ({
   const [addrErr, setAddrErr] = useState(false);
   const [amountErr, setAmountErr] = useState(false);
 
-  const [usdtContract, setUsdtContract] = useState(null);
+  const [bitContract, setBitContract] = useState(null);
   const [myBalance, setMyBalance] = useState('0.0');
   const [error, setError] = useState();
 
@@ -201,7 +201,7 @@ let Index = ({
         console.log('address:', address);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = getContractInstance(provider, 5);
-        setUsdtContract(contract);
+        setBitContract(contract);
         if (interval) {
           clearInterval(interval);
         }
@@ -211,7 +211,7 @@ let Index = ({
           ));
           interval = setInterval(() => {
             contract.balanceOf(address).then(balance => setMyBalance(
-                toBIT(balance)
+              toBIT(balance)
             ));
           }, 10000); // 10s
         }
@@ -263,7 +263,7 @@ let Index = ({
               setAmountErr(eAmount);
               // console.log(`${eAddress}, ${eAmount}`);
               if (!eAddress && !eAmount) {
-                usdtContract.mint(address, new BN(amount).times(1e6).toString()).then(tx => {
+                bitContract.mint(new BN(amount).times(1e18).toString()).then(tx => {
                   if (tx.hash) {
                     setTxs([...txs, tx.hash]);
                   }
