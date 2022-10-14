@@ -89,19 +89,6 @@ const useStyles = makeStyles(theme => ({
 
 let Root = ({children, setError}) => {
   const classes = useStyles();
-  // const provider = useEtherProvider();
-
-  // if (!provider) {
-  //   return (
-  //     <div className={classes.dialogWrapper}>
-  //       <Paper className={classes.dialog}>
-  //         <Typography variant={'h6'}>Support [Rinkeby testnet] only</Typography>
-  //         <Typography>Waiting for Ethereum wallet...</Typography>
-  //         <CircularProgress />
-  //       </Paper>
-  //     </div>
-  //   );
-  // }
   return (
     <div className={classes.container}>
       <div className={classes.contWrapper}>
