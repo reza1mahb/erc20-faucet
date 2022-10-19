@@ -245,15 +245,14 @@ let Index = ({
               onChange={e => setAddress(e.target.value)} />
             <Button className={classes.smbtn} variant={'contained'} size={'small'} onClick={e => setAddress(client.address)}>Self</Button>
           </div>
-          <TextField required id={'amount'} label={'Token Amount'} type={'number'}
+          <TextField required id={'amount'} label={'Deposit Eth Amount'} type={'number'}
             error={amountErr}
-            helperText={amountErr ? 'can only mint up to 1 - 1000 TUSDT' : ''}
+            helperText={amountErr ? 'can only mint up to 1 - 1000 ETH' : ''}
             className={classes.input}
             fullWidth
             value={amount}
             inputProps={{min: 1}}
             onChange={e => setAmount(e.target.value)} />
-
           <Button className={classes.iconButton}
             color={'primary'}
             aria-label={'Mint'}
