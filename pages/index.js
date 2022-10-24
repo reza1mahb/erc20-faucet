@@ -253,6 +253,7 @@ let Index = ({
             value={amount}
             inputProps={{min: 1}}
             onChange={e => setAmount(e.target.value)} />
+          <p>you will receive {Number(amount) * 1000} bit</p>
           <Button className={classes.iconButton}
             color={'primary'}
             aria-label={'Mint'}
