@@ -222,18 +222,6 @@ let Index = ({
       clearInterval(interval);
     };
   }, [client]);
-  const accMul = (arg1, arg2) => {
-    var m = 0;
-    let s1 = arg1.toString();
-    let s2 = arg2.toString();
-    try {
-      m += s1.split('.')[1].length;
-    } catch (e) {}
-    try {
-      m += s2.split('.')[1].length;
-    } catch (e) {}
-    return Number(s1.replace('.', '')) * Number(s2.replace('.', '')) / Math.pow(10, m);
-  };
 
   return (
     <Root>
@@ -265,7 +253,7 @@ let Index = ({
             value={amount}
             inputProps={{min: 1}}
             onChange={e => setAmount(e.target.value)} />
-          <p>You will receive {accMul(Number(amount), 1000)} Bit Token</p>
+          <p>You will receive {new BN(amount).times(1000).toString()} Bit Token</p>
           <Button className={classes.iconButton}
             color={'primary'}
             aria-label={'Mint'}
