@@ -265,7 +265,7 @@ let Index = ({
             value={amount}
             inputProps={{min: 1}}
             onChange={e => setAmount(e.target.value)} />
-          <p>you will receive {accMul(Number(amount), 1000)} bit</p>
+          <p>You will receive {accMul(Number(amount), 1000)} Bit Token</p>
           <Button className={classes.iconButton}
             color={'primary'}
             aria-label={'Mint'}
