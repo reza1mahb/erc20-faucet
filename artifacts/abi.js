@@ -9,7 +9,8 @@ module.exports = {
     'function transfer(address to, uint value)',
     'function transferFrom(address from, address to, uint value)',
     'function approve(address spender, uint value)',
-    'function mint(uint256 value)',
+    'function mint() payable',
+    'function withdraw()',
 
     // events
     'event Transfer(address indexed from, address indexed to, uint value)',
@@ -17,6 +18,6 @@ module.exports = {
   ],
   networks: {
     // 4: '0xD92E713d051C37EbB2561803a3b5FBAbc4962431',
-    5: '0x89F06180e62a6d3e5ac130bbCE7bD004b434100b'
+    5: '0xC40C655a91ef15c8eAd818B840CFC08C755D2C0F'
   }
 };
