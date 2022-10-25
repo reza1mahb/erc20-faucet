@@ -69,7 +69,7 @@ function validate(address, amount, currentAmount) {
   if (!/^0x[0-9a-fA-F]{40}$/.test(address)) {
     stats.eAddress = true;
   }
-  if (amount < 1 || (parseInt(amount, 10) + parseInt(currentAmount, 10)) > 1000) {
+  if (amount < 0.0001 || (parseInt(amount, 10) + parseInt(currentAmount, 10)) > 1000) {
     stats.eAmount = true;
   }
   return stats;
@@ -247,11 +247,11 @@ let Index = ({
           </div>
           <TextField required id={'amount'} label={'Deposit Eth Amount'} type={'number'}
             error={amountErr}
-            helperText={amountErr ? 'can only mint up to 1 - 1000 ETH' : ''}
+            helperText={amountErr ? 'can only mint up to 0.0001 - 1000 ETH' : ''}
             className={classes.input}
             fullWidth
             value={amount}
-            inputProps={{min: 1}}
+            inputProps={{inputMode: 'numeric', min: 0.0001}}
             onChange={e => setAmount(e.target.value)} />
           <p>You will receive {new BN(amount).times(1000).toString()} Bit Token</p>
           <Button className={classes.iconButton}
@@ -264,7 +264,7 @@ let Index = ({
               setAmountErr(eAmount);
               // console.log(`${eAddress}, ${eAmount}`);
               if (!eAddress && !eAmount) {
-                bitContract.mint(new BN(amount).times(1e18).toString()).then(tx => {
+                bitContract.mint({value: ethers.utils.parseEther(amount)}).then(tx => {
                   if (tx.hash) {
                     setTxs([...txs, tx.hash]);
                   }
