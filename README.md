@@ -6,3 +6,7 @@ testnet erc-20 Bit token faucet
 1. connect with web3 browser(Metamask wallet)
 2. auto switch to `Georli` testnet
 3. input valid `eth address` and `amount` to mint token for the address
+
+node version 18.12.1
+`export NODE_OPTIONS=--openssl-legacy-provider`
+

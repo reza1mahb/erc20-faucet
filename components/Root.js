@@ -108,7 +108,7 @@ let Root = ({children, setError}) => {
           {/*  variant='outlined'*/}
           {/*/>*/}
         </div>
-        <Typography className={classes.by}>{`bitdao.io/mantle`}</Typography>
+        {/* <Typography className={classes.by}>{`bitdao.io/mantle`}</Typography> */}
       </div>
     </div>
   );
