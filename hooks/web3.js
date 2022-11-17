@@ -13,8 +13,8 @@ const providerOptions = {
 };
 
 const web3Modal = new Web3Modal({
-  network: 'kovan',
-  cacheProvider: true,
+  network: 'goerli',
+  cacheProvider: false,
   providerOptions
 });
 

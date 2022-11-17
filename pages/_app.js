@@ -5,11 +5,14 @@ import { ThemeProvider } from '@material-ui/core/styles';
 import CssBaseline from '@material-ui/core/CssBaseline';
 
 import { darkTheme, lightTheme } from '../lib/theme';
-import Navbar from '../components/Navbar';
+// import Navbar from '../components/Navbar';
 import { SessionProvider } from 'next-auth/react';
+import '../styles/global.css';
+import { Web3ReactProvider } from '@web3-react/core';
+import getLibrary from '../lib/getLibrary';
 
 const App = ({ Component, pageProps: { session, ...pageProps } }) => {
-  const [darkMode, setDarkMode] = useState(0);
+  const [darkMode, setDarkMode] = useState(1);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -22,7 +25,7 @@ const App = ({ Component, pageProps: { session, ...pageProps } }) => {
     setDarkMode(
       localStorage.getItem('mode')
         ? parseInt(localStorage.getItem('mode'))
-        : 0
+        : 1
     );
     // Naive check for mobile
     setIsMobile(
@@ -49,15 +52,17 @@ const App = ({ Component, pageProps: { session, ...pageProps } }) => {
         <ThemeProvider theme={muiTheme}>
           {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
           <CssBaseline />
-          <Navbar
+          {/* <Navbar
             {...pageProps}
             darkMode={darkMode}
             toggleMode={toggleMode}
-          />
-          <Component
-            {...pageProps}
-            isMobile={isMobile}
-          />
+          /> */}
+          <Web3ReactProvider getLibrary={getLibrary}>
+            <Component
+              {...pageProps}
+              isMobile={isMobile}
+            />
+          </Web3ReactProvider>
         </ThemeProvider>
       </React.Fragment>
     </SessionProvider>

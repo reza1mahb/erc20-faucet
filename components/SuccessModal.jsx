@@ -3,7 +3,6 @@ import { makeStyles, createStyles } from '@material-ui/core/styles';
 import Modal from '@material-ui/core/Modal';
 import Backdrop from '@material-ui/core/Backdrop';
 import Fade from '@material-ui/core/Fade';
-import { truncateAddress } from '../lib/utils';
 
 const useStyles = makeStyles((theme) =>
   createStyles({
@@ -13,7 +12,6 @@ const useStyles = makeStyles((theme) =>
       justifyContent: 'center'
     },
     paper: {
-      backgroundColor: theme.palette.background.paper,
       border: 'none',
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
@@ -21,7 +19,9 @@ const useStyles = makeStyles((theme) =>
       display: 'flex',
       flexDirection: 'column',
       justifyContent: 'center',
-      alignItems: 'center'
+      alignItems: 'center',
+      backgroundColor: '#091312',
+      color: '#fff'
     },
     btn: {
       background: '#F8F8F9',
@@ -53,23 +53,10 @@ const useStyles = makeStyles((theme) =>
 
 export default function TransitionsModal(props) {
   const {
-    disconnectWallet, open, handleClose,
-    address, ethBalance
+    open, handleClose,
+    amount, tx
   } = props;
   const classes = useStyles();
-  // const [open, setOpen] = React.useState(false);
-
-  // const handleOpen = () => {
-  //   setOpen(true);
-  // };
-
-  // const handleClose = () => {
-  //   setOpen(false);
-  // };
-
-  const copyToClipboard = () => {
-
-  };
 
   return (
     <div>
@@ -89,25 +76,13 @@ export default function TransitionsModal(props) {
       >
         <Fade in={open}>
           <div className={classes.paper}>
-            <img src='/assets/metamask-logo.svg' alt='metamask' />
-            <a href='https://mantle-blockscout.qa.davionlabs.com' target='_blank'>
-              { truncateAddress(address) }
-              <img src='/assets/arrow-out.svg' alt='explorer' />
-            </a>
-            <p>{ethBalance} ETH</p>
-            <div className={classes.btnContainer}>
-              <button
-                className={classes.btn}
-                onClick={copyToClipboard}>
-                <img src='/assets/copy.svg' alt='copy' className={classes.icon} />
-                <span>Copy Address</span>
-              </button>
-              <button
-                className={classes.btn}
-                onClick={disconnectWallet}>
-                <img src='/assets/disconnect.svg' alt='copy' className={classes.icon} />
-                <span>Disconnect</span>
-              </button>
+            <img src='/assets/successful.svg' alt='metamask' />
+            <div>
+              <p>You have successful minted {amount} BIT!</p>
+              <p>Please expect gETH to your address within half an hour</p>
+              <a href={`https://mantle-blockscout.qa.davionlabs.com/tx/${tx}`} target='_blank'>
+                View on explorer
+              </a>
             </div>
           </div>
         </Fade>

@@ -1,13 +1,13 @@
 import React, {useState, useEffect} from 'react';
-import BN from 'bignumber.js';
+// import BN from 'bignumber.js';
 import Paper from '@material-ui/core/Paper';
-import Button from '@material-ui/core/Button';
 import TextField from '@material-ui/core/TextField';
-import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/styles';
-import {getContractInstance} from '../artifacts';
-import MineIcon from 'mdi-material-ui/Pickaxe';
 import * as ethers from 'ethers';
+import { useWeb3React } from '@web3-react/core';
+import useTokenContract from '../hooks/useTokenContract';
+import { TOKEN_CONTRACT } from '../lib/constants';
+import SuccessModal from './SuccessModal';
 
 const useStyles = makeStyles(theme => ({
   header: {
@@ -96,11 +96,10 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-function short(str, len) {
-  return `${str.substring(0, len)}...${str.substring(str.length - len)}`;
-}
+const MIN_MINT_AMOUNT = 1;
+const MAX_MINT_AMOUNT = 1000;
 
-function validate(address, amount, currentAmount) {
+function validate(address, amount) {
   const stats = {
     eAddress: false,
     eAmount: false
@@ -108,162 +107,38 @@ function validate(address, amount, currentAmount) {
   if (!/^0x[0-9a-fA-F]{40}$/.test(address)) {
     stats.eAddress = true;
   }
-  if (amount < 0.0001 || (parseInt(amount, 10) + parseInt(currentAmount, 10)) > 1000) {
+  if (amount < MIN_MINT_AMOUNT || parseInt(amount, 10) > MAX_MINT_AMOUNT) {
     stats.eAmount = true;
   }
   return stats;
 }
 
-function toUSD(bn) {
-  return new BN(bn.toString()).dividedBy(1e6).toString();
-}
-
-function toBIT(bn) {
-  return new BN(bn.toString()).dividedBy(1e18).toString();
-}
-
 const Mint = () => {
   const classes = useStyles();
+  const { account } = useWeb3React();
   const [address, setAddress] = useState('');
   const [amount, setAmount] = useState('');
   const [txs, setTxs] = useState([]);
+  const [tx, setTx] = useState('');
   const [addrErr, setAddrErr] = useState(false);
   const [amountErr, setAmountErr] = useState(false);
-
-  const [bitContract, setBitContract] = useState(null);
-  const [myBalance, setMyBalance] = useState('0.0');
-  const [error, setError] = useState();
-
-  const [haveMetamask, setHaveMetamask] = useState(true);
-
-  const [client, setClient] = useState({
-    isConnected: false
-  });
-
-  const changeNetwork = async () => {
-    if (!window.ethereum) throw new Error('No crypto wallet found');
-    try {
-      await window.ethereum.request({
-        method: 'wallet_switchEthereumChain',
-        params: [{ chainId: '0x5' }]
-      });
-    } catch (switchError) {
-      // This error code indicates that the chain has not been added to MetaMask.
-      if (switchError.code === 4902) {
-        try {
-          await window.ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [
-              {
-                chainId: '0x5',
-                chainName: 'Goerli',
-                nativeCurrency: {
-                  name: 'GoerliETH',
-                  symbol: 'GoerliETH',
-                  decimals: 18
-                },
-                rpcUrls: ['https://goerli.infura.io/v3/9f0c70345c8d4f9ea915af6a6141cf70'],
-                blockExplorerUrls: ['https://goerli.etherscan.io/']
-              }
-            ]
-          });
-        } catch (addError) {
-          throw addError;
-        }
-      }
-    }
-  };
-
-  const checkConnection = async () => {
-    const { ethereum } = window;
-    if (ethereum) {
-      setHaveMetamask(true);
-      const accounts = await ethereum.request({ method: 'eth_accounts' });
-      if (accounts.length > 0) {
-        setClient({
-          isConnected: true,
-          address: accounts[0]
-        });
-      } else {
-        setClient({
-          isConnected: false
-        });
-      }
-    } else {
-      setHaveMetamask(false);
-    }
-  };
-
-  const connectWeb3 = async () => {
-    try {
-      const { ethereum } = window;
-
-      if (!ethereum) {
-        console.log('Metamask not detected');
-        return;
-      }
-      const chainId = parseInt(window.ethereum.chainId);
-
-      if (chainId !== 5) {
-        setError();
-        await changeNetwork();
-      }
-
-      const accounts = await ethereum.request({
-        method: 'eth_requestAccounts'
-      });
-
-      setClient({
-        isConnected: true,
-        address: accounts[0]
-      });
-    } catch (error) {
-      console.log('Error connecting to metamask', error);
-    }
-  };
-
   useEffect(() => {
-    checkConnection();
-    connectWeb3();
-  }, []);
+    setAddress(account || '');
+  }, [account]);
 
-  useEffect(() => {
-    let interval;
-    const { ethereum } = window;
-    if (ethereum) {
-      const address = client.address;
-      if (address) {
-        console.log('address:', address);
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        const contract = getContractInstance(signer, 5);
-        setBitContract(contract);
-        if (interval) {
-          clearInterval(interval);
-        }
-        if (address) {
-          contract.balanceOf(address).then(balance => setMyBalance(
-            toBIT(balance)
-          ));
-          interval = setInterval(() => {
-            contract.balanceOf(address).then(balance => setMyBalance(
-              toBIT(balance)
-            ));
-          }, 10000); // 10s
-        }
-      }
-    }
-    return () => {
-      clearInterval(interval);
-    };
-  }, [client]);
+  const bitContract = useTokenContract(TOKEN_CONTRACT);
+  const [open, setOpen] = useState(false);
+
+  const handleOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
 
   return (
     <Paper className={classes.paper}>
-      {/* <div className={classes.cell}>
-        <Typography>{`My Address: ${client.address || '-'}`}</Typography>
-        <Typography>{`My Balance: ${myBalance} BIT`}</Typography>
-      </div> */}
       <div className={classes.h1}>
         <span className={classes.step}>Step2 </span>
         Set your mint address
@@ -274,7 +149,7 @@ const Mint = () => {
       <div className={classes.label}>Mint Address</div>
       <TextField required id={'address'} spellCheck={false}
         error={addrErr}
-        helperText={addrErr ? 'eth address incorrect!' : ''}
+        helperText={addrErr ? 'incorrect account' : ''}
         className={classes.input}
         fullWidth
         value={address}
@@ -286,46 +161,26 @@ const Mint = () => {
       <div className={classes.label}>Mint Token Amount</div>
       <TextField required id={'amount'} type={'number'}
         error={amountErr}
-        helperText={amountErr ? 'can only mint up to 0.0001 - 1000 ETH' : ''}
+        helperText={amountErr ? 'can only mint up to 1 - 1,000' : ''}
         className={classes.input}
         fullWidth
         value={amount}
         placeholder={'1-1,000'}
-        inputProps={{inputMode: 'numeric', min: 0.0001}}
+        inputProps={{inputMode: 'numeric', min: MIN_MINT_AMOUNT, max: MAX_MINT_AMOUNT}}
         onChange={e => setAmount(e.target.value)}
         variant='outlined'
       />
-      {/* <p>You will receive {new BN(amount).times(1000).toString()} Bit Token</p> */}
-      {/* <Button className={classes.iconButton}
-        color={'primary'}
-        aria-label={'Mint'}
-        variant={'contained'}
-        onClick={e => {
-          const {eAddress, eAmount} = validate(address, amount, myBalance);
-          setAddrErr(eAddress);
-          setAmountErr(eAmount);
-          // console.log(`${eAddress}, ${eAmount}`);
-          if (!eAddress && !eAmount) {
-            bitContract.mint({value: ethers.utils.parseEther(amount)}).then(tx => {
-              if (tx.hash) {
-                setTxs([...txs, tx.hash]);
-              }
-            });
-          }
-        }}>
-          Mint Token
-        <MineIcon className={classes.btnIcon} />
-      </Button> */}
       <button
         className={classes.btn}
         onClick={e => {
-          const {eAddress, eAmount} = validate(address, amount, myBalance);
+          const {eAddress, eAmount} = validate(address, amount);
           setAddrErr(eAddress);
           setAmountErr(eAmount);
-          // console.log(`${eAddress}, ${eAmount}`);
           if (!eAddress && !eAmount) {
-            bitContract.mint({value: ethers.utils.parseEther(amount)}).then(tx => {
+            bitContract.mint(ethers.utils.parseEther(amount)).then(tx => {
+              handleOpen();
               if (tx.hash) {
+                setTx(tx.hash);
                 setTxs([...txs, tx.hash]);
               }
             });
@@ -334,6 +189,7 @@ const Mint = () => {
       >
         Mint Token
       </button>
+      <SuccessModal open={open} handleClose={handleClose} tx={tx} amount={amount} />
     </Paper>
   );
 };

@@ -2,8 +2,13 @@ import React from 'react';
 import { makeStyles } from '@material-ui/styles';
 
 import Root from '../components/Root';
+import Navbar from '../components/Navbar';
 import AuthGithub from '../components/AuthGithub';
 import MintToken from '../components/MintToken';
+// import useWeb3 from '../hooks/useWeb3';
+// import useContract from '../hooks/useContract';
+import { useWeb3React } from '@web3-react/core';
+import useEagerConnect from '../hooks/useEagerConnect';
 
 const useStyles = makeStyles(theme => ({
   mainCont: {
@@ -16,17 +21,42 @@ const useStyles = makeStyles(theme => ({
     fontSize: '24px',
     lineHeight: '33px',
     color: '#15181C'
+  },
+  box: {
+    backgroundColor: '#fff',
+    padding: '32px',
+    borderRadius: '12px'
   }
 }));
 
 let Index = () => {
   const classes = useStyles();
+  // const { connectWallet } = useWeb3();
+  // const { bitContract, myAddress } = useContract();
+  const { account, library } = useWeb3React();
+
+  const triedToEagerConnect = useEagerConnect();
+
+  const isConnected = typeof account === 'string' && !!library;
+
   return (
     <Root>
+      <Navbar triedToEagerConnect={triedToEagerConnect} />
       <div className={classes.mainCont}>
         <h1 className={classes.h1}>Mantle Testnet Faucet</h1>
-        <AuthGithub />
-        <MintToken />
+        <div className={classes.box}>
+          <AuthGithub />
+          <MintToken />
+        </div>
+        <div>
+          <p>Don’t have enough gas to mint tokens? Get some goerli ETH here:</p>
+          <div>
+            <a target='_blank' rel='noreferrer' href='https://faucet.paradigm.xyz/'>Paradigm gETH Faucet</a>
+          </div>
+          <div>
+            <a target='_blank' rel='noreferrer' href='https://faucets.chain.link/'>Chainlink gETH Faucet</a>
+          </div>
+        </div>
       </div>
     </Root>
   );

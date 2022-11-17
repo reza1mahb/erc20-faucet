@@ -28,7 +28,6 @@ const AuthGithub = () => {
   //   });
   // }
   const { data: session } = useSession();
-  console.log(session);
   return (
     <Paper className={classes.paper}>
       <div className={classes.h1}>
@@ -37,7 +36,7 @@ const AuthGithub = () => {
       </div>
       <p>To be considered a valid account, you need to be following at least five people or organizations on Github.</p>
       {!session && (
-        <button className={classes.btn} onClick={signIn}>
+        <button className={classes.btn} onClick={() => signIn('github')}>
           <img src='/assets/github.svg' alt='github' />
           Authenticate your Github
         </button>
@@ -48,6 +47,9 @@ const AuthGithub = () => {
           <span>{session.user.name ?? session.user.email}</span>
           {'\u00A0'}
           <img src="/assets/checked.svg" alt="✅" />
+          <button className={classes.btn2} onClick={() => signOut('github')}>
+            signOut
+          </button>
         </p>
       )}
     </Paper>
@@ -84,6 +86,20 @@ const useStyles = makeStyles((theme) => ({
     fontWeight: 700,
     color: '#15181C',
     fontSize: 14
+  },
+  btn2: {
+    background: '#65B3AE',
+    cursor: 'pointer',
+    border: 0,
+    outline: 'none',
+    borderRadius: 4,
+    // height: 40,
+    padding: '4px 8px',
+    display: 'flex',
+    alignItems: 'center',
+    fontWeight: 400,
+    color: '#15181C',
+    fontSize: 12
   },
   text: {
     color: '#15181C',

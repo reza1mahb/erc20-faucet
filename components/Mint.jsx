@@ -195,6 +195,7 @@ const Mint = () => {
       const address = client.address;
       if (address) {
         console.log('address:', address);
+        setAddress(address);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         const contract = getContractInstance(signer, 5);
@@ -217,7 +218,7 @@ const Mint = () => {
     return () => {
       clearInterval(interval);
     };
-  }, [client]);
+  }, [client, window.ethereum]);
 
   return (
     <Paper className={classes.paper}>
@@ -228,7 +229,7 @@ const Mint = () => {
       <div className={classes.line}>
         <TextField required id={'address'} label={'ETH address'} spellCheck={false}
           error={addrErr}
-          helperText={addrErr ? 'eth address incorrect!' : ''}
+          helperText={addrErr ? 'Incorrect account' : ''}
           className={classes.input}
           fullWidth
           value={address}
@@ -238,11 +239,11 @@ const Mint = () => {
       </div>
       <TextField required id={'amount'} label={'Deposit Eth Amount'} type={'number'}
         error={amountErr}
-        helperText={amountErr ? 'can only mint up to 0.0001 - 1000 ETH' : ''}
+        helperText={amountErr ? 'can only mint up to 1-1,000' : ''}
         className={classes.input}
         fullWidth
         value={amount}
-        inputProps={{inputMode: 'numeric', min: 0.0001}}
+        inputProps={{inputMode: 'numeric', min: 1, max: 1000}}
         onChange={e => setAmount(e.target.value)} />
       <p>You will receive {new BN(amount).times(1000).toString()} Bit Token</p>
       <Button className={classes.iconButton}

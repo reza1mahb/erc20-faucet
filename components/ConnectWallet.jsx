@@ -1,39 +1,62 @@
 import React, { useEffect, useState } from 'react';
 // import Blockies from 'react-blockies';
+import BN from 'bignumber.js';
 
 import { makeStyles } from '@material-ui/core/styles';
+import { useWeb3React } from '@web3-react/core';
+import { UserRejectedRequestError } from '@web3-react/injected-connector';
 
-import { useWeb3Modal } from '../hooks/web3';
+// import { useWeb3Modal } from '../hooks/web3';
 import Modal from './Modal';
 import { truncateAddress } from '../lib/utils';
+import { injected } from '../lib/connectors';
+import useETHBalance from '../hooks/useETHBalance';
+import useTokenBalance from '../hooks/useTokenBalance';
+import { TOKEN_CONTRACT } from '../lib/constants';
 
-const ConnectWallet = () => {
+function parseBalance(bn) {
+  return new BN(bn.toString()).dividedBy(1e18).toString();
+}
+
+const ConnectWallet = ({myAddress}) => {
+  const [connecting, setConnecting] = useState(false);
+
   const classes = useStyles();
 
   const [signerAddress, setSignerAddress] = useState('');
+
+  const { active, error, activate, chainId, account, setError, library } =
+    useWeb3React();
+  const ethBalance = useETHBalance(account);
+  const tokenBalance = useTokenBalance(account, TOKEN_CONTRACT);
+  console.log(ethBalance, tokenBalance);
+
+  const isConnected = typeof account === 'string' && !!library;
+
   // const [isWaiting, setWaiting] = useState(false)
   // const [isSent, setSent] = useState(false)
   // const [walletNotDetected, setWalletNotDetected] = useState(false)
 
-  const { connectWallet, disconnectWallet, provider, error } = useWeb3Modal();
-
-  console.log(error);
+  // const { connectWallet, disconnectWallet, provider, error } = useWeb3Modal();
 
   useEffect(() => {
-    const getAddress = async () => {
-      const signer = provider.getSigner();
-      const address = await signer.getAddress();
-      setSignerAddress(address);
-    };
-    if (provider) getAddress();
-    else setSignerAddress('');
-  }, [provider]);
+    setSignerAddress(myAddress || '');
+  }, [myAddress]);
 
   const handleClickConnect = async () => {
-    await connectWallet();
+    setConnecting(true);
+    activate(injected, undefined, true).catch((error) => {
+      // ignore the error if it's a user rejected request
+      if (error instanceof UserRejectedRequestError) {
+        setConnecting(false);
+      } else {
+        setError(error);
+      }
+    });
   };
+  const disconnectWallet = async () => {};
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleOpen = () => {
     setOpen(true);
@@ -43,22 +66,26 @@ const ConnectWallet = () => {
     setOpen(false);
   };
 
-  if (signerAddress) {
+  if (isConnected) {
     return (
-      <div>
+      <div className={classes.container}>
+        <div className={classes.bit}>
+          {parseBalance(tokenBalance.data || '')} Bit
+        </div>
         <div
           onClick={handleOpen}
           className={classes.address}
         >
           <span className={classes.dot} />
-          {truncateAddress(signerAddress)}
+          {truncateAddress(account)}
         </div>
         <Modal
           disconnectWallet={disconnectWallet}
           open={open}
           handleOpen={handleOpen}
           handleClose={handleClose}
-          address={signerAddress}
+          address={account}
+          ethBalance={parseBalance(ethBalance.data || '')}
         />
       </div>
     );
@@ -68,17 +95,8 @@ const ConnectWallet = () => {
     <button
       className={classes.btn}
       onClick={handleClickConnect}>
-      {/* <Blockies
-        className={classes.img}
-        seed={signerAddress.toLowerCase()}
-        size={8}
-        scale={3}
-      /> */}
-      <div>
-        {signerAddress ? truncateAddress(signerAddress) : 'Connect Wallet'}
-      </div>
+        Connect Wallet
     </button>
-
   );
 };
 
@@ -117,6 +135,16 @@ const useStyles = makeStyles((theme) => ({
     color: '#15181C',
     fontSize: 14,
     cursor: 'pointer'
+  },
+  container: {
+    display: 'flex',
+    flexDirection: 'row'
+  },
+  bit: {
+    fontWeight: 700,
+    color: '#15181C',
+    fontSize: 14,
+    marginRight: 10
   }
 }));
 
