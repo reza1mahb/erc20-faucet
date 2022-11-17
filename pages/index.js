@@ -5,9 +5,6 @@ import Root from '../components/Root';
 import Navbar from '../components/Navbar';
 import AuthGithub from '../components/AuthGithub';
 import MintToken from '../components/MintToken';
-// import useWeb3 from '../hooks/useWeb3';
-// import useContract from '../hooks/useContract';
-import { useWeb3React } from '@web3-react/core';
 import useEagerConnect from '../hooks/useEagerConnect';
 
 const useStyles = makeStyles(theme => ({
@@ -31,13 +28,8 @@ const useStyles = makeStyles(theme => ({
 
 let Index = () => {
   const classes = useStyles();
-  // const { connectWallet } = useWeb3();
-  // const { bitContract, myAddress } = useContract();
-  const { account, library } = useWeb3React();
 
   const triedToEagerConnect = useEagerConnect();
-
-  const isConnected = typeof account === 'string' && !!library;
 
   return (
     <Root>
